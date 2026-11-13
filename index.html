@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1220">
+  <title>PulseLab with Camera PPG</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="header">
+    <div class="logo">✦ PulseLab</div>
+    <div id="status" class="status">Patient details required</div>
+  </header>
+
+  <!-- 1. PATIENT FORM -->
+  <section class="card" id="patientCard">
+    <div class="tag">PATIENT INFORMATION</div>
+    <h1>Enter details first</h1>
+    <p class="muted">
+      Enter the Your basic information before starting the camera measurement.
+      BMI will be calculated automatically.
+    </p>
+
+    <form id="patientForm">
+      <div class="form-grid">
+
+        <div class="full">
+          <label for="name">Name</label>
+          <input id="name" type="text" maxlength="60"
+                 placeholder="Enter name" required>
+        </div>
+
+        <div>
+          <label for="age">Age (years)</label>
+          <input id="age" type="number" min="1" max="120"
+                 placeholder="e.g. 24" required>
+        </div>
+
+        <div>
+          <label for="weight">Weight (kg)</label>
+          <input id="weight" type="number" min="10" max="300"
+                 step="0.1" placeholder="e.g. 65" required>
+        </div>
+
+        <div>
+          <label for="height">Height (cm)</label>
+          <input id="height" type="number" min="50" max="250"
+                 step="0.1" placeholder="e.g. 180" required>
+        </div>
+
+      </div>
+
+      <button class="btn primary" type="submit">
+        Continue to Camera →
+      </button>
+    </form>
+  </section>
+
+  <!-- 2. CAMERA -->
+  <section class="card" id="cameraCard" style="display:none">
+
+    <div class="tag">60-SECOND MEASUREMENT</div>
+
+    <h1>Measure your pulse</h1>
+
+    <p class="muted">
+      Place your fingertip gently over the rear camera don't press hard if you are on laptop and flashlight.
+      Keep your finger still. The measurement automatically stops after
+      60 seconds.
+    </p>
+
+    <div class="camera">
+
+      <video id="video" autoplay muted playsinline></video>
+
+      <canvas id="hiddenCanvas"></canvas>
+
+      <div class="guide"></div>
+
+      <div id="timer" class="timer">60 s</div>
+
+      <div id="hint" class="hint">
+        Tap Start Camera
+      </div>
+
+    </div>
+
+    <div class="controls">
+
+      <button id="cameraBtn" class="btn primary">
+        📷 Start Camera
+      </button>
+
+      <button id="torchBtn" class="btn secondary" disabled>
+        🔦 Flashlight ON
+      </button>
+
+      <button id="startBtn" class="btn primary" disabled>
+        ❤️ Start 60-sec Measurement
+      </button>
+
+      <button id="stopBtn" class="btn secondary" disabled>
+        Stop
+      </button>
+
+    </div>
+
+  </section>
+
+  <!-- 3.FOR  LIVE METRICS + GRAPH (FLASH NOT WORKING )-->
+  <section class="card">
+
+    <div class="metrics">
+
+      <div class="metric">
+        <span>Heart Rate</span>
+        <strong id="bpm">—</strong>
+        <div class="unit">BPM</div>
+      </div>
+
+      <div class="metric">
+        <span>Signal Quality</span>
+        <strong id="quality">—</strong>
+        <div class="unit" id="qualityText">Waiting</div>
+      </div>
+
+      <div class="metric">
+        <span>Pulse Variability</span>
+        <strong id="rmssd">—</strong>
+        <div class="unit">RMSSD ms</div>
+      </div>
+
+      <div class="metric">
+        <span>Time</span>
+        <strong id="elapsed">0</strong>
+        <div class="unit">/ 60 seconds</div>
+      </div>
+
+    </div>
+
+    <div class="chart-wrap">
+      <canvas id="chart" width="1200" height="460"></canvas>
+    </div>
+
+  </section>
+
+  <!-- 4. REPORT -->
+  <section class="card">
+
+    <h3>Wellness Report</h3>
+
+    <div id="report" class="report">
+      Enter patient details and complete a 60-second measurement
+      to generate the report.
+    </div>
+
+    <div class="small-actions">
+
+      <button id="downloadReportBtn"
+              class="btn primary"
+              disabled>
+        ⬇️ Download Report
+      </button>
+
+      <button id="newBtn"
+              class="btn secondary">
+        ↻ New Measurement
+      </button>
+
+    </div>
+
+  </section>
+
+  <!-- 5. HISTORY -->
+  <section class="card">
+
+    <h3>Measurement History</h3>
+
+    <p class="muted">
+      Completed measurements are automatically stored locally
+      in this browser.
+    </p>
+
+    <div class="history">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Weight</th>
+            <th>Height</th>
+            <th>BMI</th>
+            <th>BPM</th>
+            <th>Stress</th>
+          </tr>
+        </thead>
+
+        <tbody id="historyBody">
+          <tr>
+            <td class="empty" colspan="8">
+              No measurements saved yet.
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <div class="small-actions">
+
+      <button id="exportCsvBtn"
+              class="btn secondary">
+        Export CSV
+      </button>
+
+      <button id="clearHistoryBtn"
+              class="btn secondary">
+        Clear History
+      </button>
+
+    </div>
+
+  </section>
+
+  <!-- 6. DECLARATION -->
+  <div class="notice">
+
+    <b>Declaration:</b>
+    PulseLab is an experimental project using
+    camera-based PPG.
+
+    It is <b>not a medical device</b>, does <b>not measure blood pressure</b>,
+    and its stress indicator is not a clinical diagnosis.
+
+    Do not use this report to diagnose, treat, or make medical decisions.
+
+    For actual blood pressure, use a validated blood pressure machine and
+    consult a Doctor or a healthcare professional when needed.
+
+  </div>
+
+</div>
+
+<script src="js/ppg.js"></script>
+<script src="js/report.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
